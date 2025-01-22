@@ -23,7 +23,7 @@ addon_info = {
     # Translators: Long description to be shown for this add-on on add-on information from add-ons manager
     "addon_description": _("""Adds useful features for developers."""),
     # version
-    "addon_version": "0.0.0",
+    "addon_version": "0.0.1",
     # Author(s)
     "addon_author": "Danstiv <danstiv@yandex.ru>",
     # URL for the add-on documentation support
