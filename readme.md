@@ -18,8 +18,6 @@ This addon detects 2 or more consecutive spaces, and folds them into a short seq
 For example "space space space space space" becomes "5 space".
 
 ### Diff indication
-Not in upstream for now, I'll add it later.
-
 When navigating through an object using numpad7 or numpad9, the addon checks for a diff character at the beginning of the line.
 
 The space is ignored,  for the plus or minus a sound is played, to make addition/deletion easy to identify.

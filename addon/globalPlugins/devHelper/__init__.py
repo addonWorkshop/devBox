@@ -1,10 +1,29 @@
+from pathlib import Path
+
+import addonHandler
+import api
 import characterProcessing
+import globalCommands
 import globalPluginHandler
 import languageHandler
+import nvwave
+import scriptHandler
 import speech
+import textInfos
+
+SOUNDS_DIR = Path(__file__).parent / "media"
+DIFF_SOUNDS = {
+    "-": "diffLineDeleted.wav",
+    "+": "diffLineInserted.wav",
+}
+DIFF_SOUNDS = {k: str(SOUNDS_DIR / v) for k, v in DIFF_SOUNDS.items()}
 
 SPACE = characterProcessing.processSpeechSymbol(languageHandler.getLanguage(), " ")
 end_utterance_command = speech.commands.EndUtteranceCommand()
+
+# We need this to get translations fromNVDA standard catalog.
+gettext = _
+addonHandler.initTranslation()
 
 
 def get_spelling_speech_decorator(func):
@@ -63,3 +82,56 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         speech.speech._getSpellingSpeechWithoutCharMode = (
             self._speech_speech__getSpellingSpeechWithoutCharMode
         )
+
+    @scriptHandler.script(
+        description=gettext(
+            # Translators: Input help mode message for move review cursor to previous line command.
+            "Moves the review cursor to the previous line of the current navigator object and speaks it",
+        ),
+        resumeSayAllMode=speech.sayAll.CURSOR.REVIEW,
+        category=globalCommands.SCRCAT_TEXTREVIEW,
+        gestures=("kb:numpad7", "kb(laptop):NVDA+upArrow", "ts(text):flickUp"),
+    )
+    def script_review_previous_line(self, gesture):
+        result = globalCommands.commands.script_review_previousLine(gesture)
+        self.report_diff_line_status()
+        return result
+
+    @scriptHandler.script(
+        description=gettext(
+            # Translators: Input help mode message for read current line under review cursor command.
+            "Reports the line of the current navigator object where the review cursor is situated. "
+            "If this key is pressed twice, the current line will be spelled. "
+            "Pressing three times will spell the line using character descriptions.",
+        ),
+        category=globalCommands.SCRCAT_TEXTREVIEW,
+        gestures=("kb:numpad8", "kb(laptop):NVDA+shift+."),
+        speakOnDemand=True,
+    )
+    def script_review_currentLine(self, gesture):
+        result = globalCommands.commands.script_review_currentLine(gesture)
+        if scriptHandler.getLastScriptRepeatCount() == 0:
+            self.report_diff_line_status()
+        return result
+
+    @scriptHandler.script(
+        description=gettext(
+            # Translators: Input help mode message for move review cursor to next line command.
+            "Moves the review cursor to the next line of the current navigator object and speaks it",
+        ),
+        resumeSayAllMode=speech.sayAll.CURSOR.REVIEW,
+        category=globalCommands.SCRCAT_TEXTREVIEW,
+        gestures=("kb:numpad9", "kb(laptop):NVDA+downArrow", "ts(text):flickDown"),
+    )
+    def script_review_nextLine(self, gesture):
+        result = globalCommands.commands.script_review_nextLine(gesture)
+        self.report_diff_line_status()
+        return result
+
+    def report_diff_line_status(self):
+        info = api.getReviewPosition().copy()
+        info.expand(textInfos.UNIT_LINE)
+        text = info.text
+        if not text or text[0] not in DIFF_SOUNDS:
+            return
+        nvwave.playWaveFile(DIFF_SOUNDS[text[0]])
