@@ -1,11 +1,7 @@
-import api
 import characterProcessing
 import globalPluginHandler
 import languageHandler
 import speech
-import textInfos
-import ui
-from scriptHandler import script
 
 SPACE = characterProcessing.processSpeechSymbol(languageHandler.getLanguage(), " ")
 end_utterance_command = speech.commands.EndUtteranceCommand()
