@@ -58,7 +58,7 @@ def get_spelling_speech_decorator(func):
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
-    scriptCategory = "Dev Helper"
+    scriptCategory = "Dev Box"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

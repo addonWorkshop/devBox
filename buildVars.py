@@ -16,9 +16,9 @@ def _(arg):
 # Add-on information variables
 addon_info = {
     # add-on Name/identifier, internal for NVDA
-    "addon_name": "devHelper",
+    "addon_name": "devBox",
     # Add-on summary, usually the user visible name of the addon.
-    "addon_summary": "Dev Helper",
+    "addon_summary": "Dev Box",
     # Add-on description
     # Translators: Long description to be shown for this add-on on add-on information from add-ons manager
     "addon_description": _("""Adds useful features for developers."""),
@@ -29,7 +29,7 @@ addon_info = {
     # URL for the add-on documentation support
     "addon_url": None,
     # URL for the add-on repository where the source code can be found
-    "addon_sourceURL": "https://github.com/addonWorkshop/devHelper",
+    "addon_sourceURL": "https://github.com/addonWorkshop/devBox",
     # Documentation file name
     "addon_docFileName": "readme.html",
     # Minimum NVDA version supported (e.g. "2018.3.0", minor version is optional)
@@ -54,7 +54,7 @@ addon_info = {
 # pythonSources = ["addon/globalPlugins/*.py"]
 # For more information on SCons Glob expressions please take a look at:
 # https://scons.org/doc/production/HTML/scons-user/apd.html
-pythonSources = ["addon/globalPlugins/devHelper/*.py"]
+pythonSources = ["addon/globalPlugins/devBox/*.py"]
 
 # Files that contain strings for translation. Usually your python sources
 i18nSources = pythonSources + ["buildVars.py"]

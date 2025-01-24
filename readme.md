@@ -1,4 +1,4 @@
-# Dev Helper
+# Dev Box
 
 This addon contains some features that are primarily useful for software developers, but may also be useful for other users who work with text.
 
