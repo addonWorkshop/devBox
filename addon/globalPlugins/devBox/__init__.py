@@ -10,6 +10,7 @@ import nvwave
 import scriptHandler
 import speech
 import textInfos
+from baseObject import ScriptableObject
 
 SOUNDS_DIR = Path(__file__).parent / "media"
 DIFF_SOUNDS = {
@@ -57,31 +58,8 @@ def get_spelling_speech_decorator(func):
     return wrapper
 
 
-class GlobalPlugin(globalPluginHandler.GlobalPlugin):
+class DevBoxOverlay(ScriptableObject):
     scriptCategory = "Dev Box"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._speech__getSpellingSpeechWithoutCharMode = (
-            speech._getSpellingSpeechWithoutCharMode
-        )
-        speech._getSpellingSpeechWithoutCharMode = get_spelling_speech_decorator(
-            speech._getSpellingSpeechWithoutCharMode
-        )
-        self._speech_speech__getSpellingSpeechWithoutCharMode = (
-            speech.speech._getSpellingSpeechWithoutCharMode
-        )
-        speech.speech._getSpellingSpeechWithoutCharMode = get_spelling_speech_decorator(
-            speech.speech._getSpellingSpeechWithoutCharMode
-        )
-
-    def terminate(self):
-        speech._getSpellingSpeechWithoutCharMode = (
-            self._speech__getSpellingSpeechWithoutCharMode
-        )
-        speech.speech._getSpellingSpeechWithoutCharMode = (
-            self._speech_speech__getSpellingSpeechWithoutCharMode
-        )
 
     @scriptHandler.script(
         description=gettext(
@@ -135,3 +113,33 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if not text or text[0] not in DIFF_SOUNDS:
             return
         nvwave.playWaveFile(DIFF_SOUNDS[text[0]])
+
+
+class GlobalPlugin(globalPluginHandler.GlobalPlugin):
+    scriptCategory = "Dev Box"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._speech__getSpellingSpeechWithoutCharMode = (
+            speech._getSpellingSpeechWithoutCharMode
+        )
+        speech._getSpellingSpeechWithoutCharMode = get_spelling_speech_decorator(
+            speech._getSpellingSpeechWithoutCharMode
+        )
+        self._speech_speech__getSpellingSpeechWithoutCharMode = (
+            speech.speech._getSpellingSpeechWithoutCharMode
+        )
+        speech.speech._getSpellingSpeechWithoutCharMode = get_spelling_speech_decorator(
+            speech.speech._getSpellingSpeechWithoutCharMode
+        )
+
+    def terminate(self):
+        speech._getSpellingSpeechWithoutCharMode = (
+            self._speech__getSpellingSpeechWithoutCharMode
+        )
+        speech.speech._getSpellingSpeechWithoutCharMode = (
+            self._speech_speech__getSpellingSpeechWithoutCharMode
+        )
+
+    def chooseNVDAObjectOverlayClasses(self, obj, cls_list):
+        cls_list.insert(0, DevBoxOverlay)
