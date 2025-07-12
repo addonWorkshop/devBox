@@ -2,59 +2,38 @@ from pathlib import Path
 
 import addonHandler
 import api
-import characterProcessing
+import config
 import globalCommands
 import globalPluginHandler
-import languageHandler
 import nvwave
 import scriptHandler
 import speech
 import textInfos
 
-SOUNDS_DIR = Path(__file__).parent / "media"
+from . import interface
+from .features.diff_sounds import DiffSoundsFeature
+from .features.space_folding import SpaceFoldingFeature
+
+config.conf.spec["devBox"] = {
+    "features": {
+        "diffSounds": "boolean(default=false)",
+        "spaceFolding": "boolean(default=false)",
+    },
+}
+ADDON_ROOT = Path(addonHandler.getCodeAddon().installPath).resolve()
+SOUNDS_DIR = ADDON_ROOT / "media"
 DIFF_SOUNDS = {
     "-": "diffLineDeleted.wav",
     "+": "diffLineInserted.wav",
 }
 DIFF_SOUNDS = {k: str(SOUNDS_DIR / v) for k, v in DIFF_SOUNDS.items()}
 
-SPACE = characterProcessing.processSpeechSymbol(languageHandler.getLanguage(), " ")
-end_utterance_command = speech.commands.EndUtteranceCommand()
 
 # We need this to get translations fromNVDA standard catalog.
 gettext = _
+
+
 addonHandler.initTranslation()
-
-
-def get_spelling_speech_decorator(func):
-    def wrapper(*args, **kwargs):
-        original_commands = list(func(*args, **kwargs))
-        new_commands = []
-        spaces_buffer = []
-
-        def flush_spaces_buffer():
-            spaces_amount = len(spaces_buffer) // 2
-            if spaces_amount < 2:
-                new_commands.extend(spaces_buffer)
-            else:
-                new_commands.append(f"{spaces_amount} {SPACE}")
-                new_commands.append(end_utterance_command)
-            spaces_buffer.clear()
-
-        cursor = 0
-        while cursor < len(original_commands):
-            command = original_commands[cursor]
-            if isinstance(command, str) and command == SPACE:
-                spaces_buffer.extend(original_commands[cursor : cursor + 2])
-                cursor += 2  # Space and end utterance command
-                continue
-            flush_spaces_buffer()
-            new_commands.append(command)
-            cursor += 1
-        flush_spaces_buffer()
-        return new_commands
-
-    return wrapper
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
@@ -62,30 +41,29 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._speech__getSpellingSpeechWithoutCharMode = (
-            speech._getSpellingSpeechWithoutCharMode
-        )
-        speech._getSpellingSpeechWithoutCharMode = get_spelling_speech_decorator(
-            speech._getSpellingSpeechWithoutCharMode
-        )
-        self._speech_speech__getSpellingSpeechWithoutCharMode = (
-            speech.speech._getSpellingSpeechWithoutCharMode
-        )
-        speech.speech._getSpellingSpeechWithoutCharMode = get_spelling_speech_decorator(
-            speech.speech._getSpellingSpeechWithoutCharMode
-        )
+        self.config = config.conf["devBox"]
+        self._diff_sounds_enabled = False
+        self.features = [SpaceFoldingFeature(self), DiffSoundsFeature(self)]
+        self.sync_features()
+        interface.add_settings(self.on_config_change)
+        config.post_configProfileSwitch.register(self.on_profile_switch)
+
+    def on_config_change(self):
+        self.sync_features()
+
+    def on_profile_switch(self):
+        self.sync_features()
+
+    def sync_features(self):
+        [feature.sync() for feature in self.features]
 
     def terminate(self):
-        speech._getSpellingSpeechWithoutCharMode = (
-            self._speech__getSpellingSpeechWithoutCharMode
-        )
-        speech.speech._getSpellingSpeechWithoutCharMode = (
-            self._speech_speech__getSpellingSpeechWithoutCharMode
-        )
+        [feature.terminate() for feature in self.features]
+        interface.remove_settings()
+        config.post_configProfileSwitch.unregister(self.on_profile_switch)
 
     @scriptHandler.script(
         description=gettext(
-            # Translators: Input help mode message for move review cursor to previous line command.
             "Moves the review cursor to the previous line of the current navigator object and speaks it",
         ),
         resumeSayAllMode=speech.sayAll.CURSOR.REVIEW,
@@ -99,7 +77,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     @scriptHandler.script(
         description=gettext(
-            # Translators: Input help mode message for read current line under review cursor command.
             "Reports the line of the current navigator object where the review cursor is situated. "
             "If this key is pressed twice, the current line will be spelled. "
             "Pressing three times will spell the line using character descriptions.",
@@ -116,7 +93,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     @scriptHandler.script(
         description=gettext(
-            # Translators: Input help mode message for move review cursor to next line command.
             "Moves the review cursor to the next line of the current navigator object and speaks it",
         ),
         resumeSayAllMode=speech.sayAll.CURSOR.REVIEW,
@@ -129,6 +105,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         return result
 
     def report_diff_line_status(self):
+        if not self._diff_sounds_enabled:
+            return
         info = api.getReviewPosition().copy()
         info.expand(textInfos.UNIT_LINE)
         text = info.text
