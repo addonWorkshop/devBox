@@ -23,3 +23,10 @@ When navigating through an object using numpad7 or numpad9, the addon checks for
 The space is ignored,  for the plus or minus a sound is played, to make addition/deletion easy to identify.
 
 The sounds are taken from vscode, they are also slightly modified (a small amount of silence at the beginning and end is cut off).
+
+### Line length checking
+This feature allows to find out the length of the line under cursor, it can be useful when formatting code or any other text.
+Gesture is unassigned by default.
+
+---
+All passive features, like space folding, is disabled by default, they could be enabled in addon settings.
