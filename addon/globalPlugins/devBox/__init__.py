@@ -9,6 +9,7 @@ import nvwave
 import scriptHandler
 import speech
 import textInfos
+import ui
 
 from . import interface
 from .features.diff_sounds import DiffSoundsFeature
@@ -113,3 +114,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if not text or text[0] not in DIFF_SOUNDS:
             return
         nvwave.playWaveFile(DIFF_SOUNDS[text[0]])
+
+    @scriptHandler.script(description=_("Report current line length"))
+    def script_report_current_line_length(self, gesture):
+        obj = api.getCaretObject()
+        text_info = obj.makeTextInfo(textInfos.POSITION_CARET)
+        text_info.expand(textInfos.UNIT_LINE)
+        line = text_info.text.rstrip("\r\n")
+        ui.message(str(len(line)))
