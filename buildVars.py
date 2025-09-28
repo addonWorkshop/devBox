@@ -21,7 +21,10 @@ addon_info = {
     "addon_summary": "Dev Box",
     # Add-on description
     # Translators: Long description to be shown for this add-on on add-on information from add-ons manager
-    "addon_description": _("""Adds useful features for developers."""),
+    "addon_description": _(
+        "Adds useful features for developers (consecutive spaces folding, diff indication and more).\n"
+        "Also could be useful for users who work with text."
+    ),
     # version
     "addon_version": "0.1.1",
     # Author(s)
