@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 
 import addonHandler
@@ -122,3 +123,10 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         text_info.expand(textInfos.UNIT_LINE)
         line = text_info.text.rstrip("\r\n")
         ui.message(str(len(line)))
+
+    @scriptHandler.script(
+        description=_("Report current second in a minute"),
+        gesture="kb:nvda+control+f12",
+    )
+    def script_report_current_second(self, gesture):
+        ui.message(str(datetime.datetime.now().second))
