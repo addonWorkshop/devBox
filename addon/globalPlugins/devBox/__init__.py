@@ -66,6 +66,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
     @scriptHandler.script(
         description=gettext(
+            "Moves the review cursor to the top line of the current navigator object and speaks it",
+        ),
+        category=globalCommands.SCRCAT_TEXTREVIEW,
+        gestures=("kb:shift+numpad7", "kb(laptop):NVDA+control+home"),
+    )
+    def script_review_top(self, gesture):
+        result = globalCommands.commands.script_review_top(gesture)
+        self.report_diff_line_status()
+        return result
+
+    @scriptHandler.script(
+        description=gettext(
             "Moves the review cursor to the previous line of the current navigator object and speaks it",
         ),
         resumeSayAllMode=speech.sayAll.CURSOR.REVIEW,
@@ -103,6 +115,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     )
     def script_review_nextLine(self, gesture):
         result = globalCommands.commands.script_review_nextLine(gesture)
+        self.report_diff_line_status()
+        return result
+
+    @scriptHandler.script(
+        description=gettext(
+            "Moves the review cursor to the bottom line of the current navigator object and speaks it",
+        ),
+        category=globalCommands.SCRCAT_TEXTREVIEW,
+        gestures=("kb:shift+numpad9", "kb(laptop):NVDA+control+end"),
+    )
+    def script_review_bottom(self, gesture):
+        result = globalCommands.commands.script_review_bottom(gesture)
         self.report_diff_line_status()
         return result
 
