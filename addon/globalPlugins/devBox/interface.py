@@ -25,9 +25,7 @@ class DevBoxSettingsPanel(ConfigBoundSettingsPanel):
         )
         features_list.Append(_("Space folding"), "spaceFolding")
         features_list.Append(_("Diff sounds"), "diffSounds")
-        self.feature_list = bind_with_config(
-            features_list, "features", CheckListBoxToDictConverter
-        )
+        self.feature_list = bind_with_config(features_list, "features", CheckListBoxToDictConverter)
         self.feature_list.SetSelection(0)
 
 

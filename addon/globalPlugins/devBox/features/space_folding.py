@@ -44,9 +44,7 @@ class SpaceFoldingFeature(BaseFeature):
         super().__init__(global_plugin, "spaceFolding")
 
     def enable(self):
-        self._speech__getSpellingSpeechWithoutCharMode = (
-            speech._getSpellingSpeechWithoutCharMode
-        )
+        self._speech__getSpellingSpeechWithoutCharMode = speech._getSpellingSpeechWithoutCharMode
         speech._getSpellingSpeechWithoutCharMode = get_spelling_speech_decorator(
             speech._getSpellingSpeechWithoutCharMode
         )
@@ -58,9 +56,7 @@ class SpaceFoldingFeature(BaseFeature):
         )
 
     def disable(self):
-        speech._getSpellingSpeechWithoutCharMode = (
-            self._speech__getSpellingSpeechWithoutCharMode
-        )
+        speech._getSpellingSpeechWithoutCharMode = self._speech__getSpellingSpeechWithoutCharMode
         speech.speech._getSpellingSpeechWithoutCharMode = (
             self._speech_speech__getSpellingSpeechWithoutCharMode
         )
