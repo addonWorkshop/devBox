@@ -28,7 +28,9 @@ The sounds are taken from vscode, they are also slightly modified (a small amoun
 ### Screen navigation
 control+numpad7 and control+numpad9 move the review cursor one screen up or down.
 
-The screen height is taken from the visible area of the navigator object, so this works only for UIA text controls, such as Windows Terminal or consoles with UIA support enabled.
+The screen height is taken from the visible area of the navigator object, so this works reliably only for UIA text controls, such as Windows Terminal. In other cases the cursor moves exactly 40 lines.
+
+Real use case: go to first line of the page outputted by the less pager.
 
 ### Line length checking
 This feature allows to find out the length of the line under cursor, it can be useful when formatting code or any other text.

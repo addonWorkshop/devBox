@@ -151,9 +151,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         text_pattern = getattr(api.getNavigatorObject(), "UIATextPattern", None)
         visible_ranges = text_pattern.GetVisibleRanges() if text_pattern else None
         if not visible_ranges or not visible_ranges.length:
-            ui.message(_("Screen navigation is not supported here"))
-            return
-        lines_amount = len(visible_ranges.GetElement(0).GetBoundingRectangles()) // 4 - 1
+            lines_amount = 40
+        else:
+            lines_amount = len(visible_ranges.GetElement(0).GetBoundingRectangles()) // 4 - 1
         info = api.getReviewPosition().copy()
         info.expand(textInfos.UNIT_LINE)
         info.collapse()
