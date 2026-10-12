@@ -25,6 +25,11 @@ The space is ignored,  for the plus or minus a sound is played, to make addition
 
 The sounds are taken from vscode, they are also slightly modified (a small amount of silence at the beginning and end is cut off).
 
+### Screen navigation
+control+numpad7 and control+numpad9 move the review cursor one screen up or down.
+
+The screen height is taken from the visible area of the navigator object, so this works only for UIA text controls, such as Windows Terminal or consoles with UIA support enabled.
+
 ### Line length checking
 This feature allows to find out the length of the line under cursor, it can be useful when formatting code or any other text.
 Gesture is unassigned by default.

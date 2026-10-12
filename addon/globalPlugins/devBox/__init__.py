@@ -4,6 +4,7 @@ from pathlib import Path
 import addonHandler
 import api
 import config
+import controlTypes
 import globalCommands
 import globalPluginHandler
 import nvwave
@@ -129,6 +130,46 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         result = globalCommands.commands.script_review_bottom(gesture)
         self.report_diff_line_status()
         return result
+
+    @scriptHandler.script(
+        description=_("Moves the review cursor one screen up and speaks the line"),
+        category=globalCommands.SCRCAT_TEXTREVIEW,
+        gesture="kb:control+numpad7",
+    )
+    def script_review_previous_screen(self, gesture):
+        self.switch_screen(-1)
+
+    @scriptHandler.script(
+        description=_("Moves the review cursor one screen down and speaks the line"),
+        category=globalCommands.SCRCAT_TEXTREVIEW,
+        gesture="kb:control+numpad9",
+    )
+    def script_review_next_screen(self, gesture):
+        self.switch_screen(1)
+
+    def switch_screen(self, direction):
+        text_pattern = getattr(api.getNavigatorObject(), "UIATextPattern", None)
+        visible_ranges = text_pattern.GetVisibleRanges() if text_pattern else None
+        if not visible_ranges or not visible_ranges.length:
+            ui.message(_("Screen navigation is not supported here"))
+            return
+        lines_amount = len(visible_ranges.GetElement(0).GetBoundingRectangles()) // 4 - 1
+        info = api.getReviewPosition().copy()
+        info.expand(textInfos.UNIT_LINE)
+        info.collapse()
+        new_info = info.copy()
+        moved = new_info.move(textInfos.UNIT_LINE, lines_amount * direction)
+        new_info.expand(textInfos.UNIT_LINE)
+        if moved == 0 or (direction == 1 and info.start == new_info.start):
+            ui.reviewMessage(gettext("Top") if direction == -1 else gettext("Bottom"))
+        else:
+            api.setReviewPosition(new_info)
+        speech.speakTextInfo(
+            new_info,
+            unit=textInfos.UNIT_LINE,
+            reason=controlTypes.OutputReason.CARET,
+        )
+        self.report_diff_line_status()
 
     def report_diff_line_status(self):
         if not self._diff_sounds_enabled:
