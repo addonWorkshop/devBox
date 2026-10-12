@@ -21,7 +21,7 @@ Also could be useful for users who work with text."""
 
 # Version of this add-on. The add-on store requires major.minor.patch integers.
 # `nvaddon release patch` sets this for you.
-version = "0.4.0"
+version = "0.5.0"
 
 # Translators: What's new in this version of the add-on, shown in the add-on store.
 changelog = """Initial release."""
