@@ -53,6 +53,9 @@ Of course, you can simply enable the display of seconds in Windows settings, but
 
 nvda+ctrl+f12 is bound by default.
 
+### Logging
+- Switch between info and debug unredacted levels using gesture (unassigned by default)
+
 ---
 All passive features, like space folding, is disabled by default, they could be enabled in addon settings.
 

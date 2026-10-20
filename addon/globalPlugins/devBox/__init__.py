@@ -7,11 +7,13 @@ import config
 import controlTypes
 import globalCommands
 import globalPluginHandler
+import logHandler
 import nvwave
 import scriptHandler
 import speech
 import textInfos
 import ui
+from config.configFlags import LoggingLevel
 
 from . import interface
 from .features.diff_sounds import DiffSoundsFeature
@@ -195,3 +197,19 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     )
     def script_report_current_second(self, gesture):
         ui.message(str(datetime.datetime.now().second))
+
+    @scriptHandler.script(description="Cycle logging level between info and debug (unredacted)")
+    def script_cycle_logging_levels(self, gesture):
+        if logHandler.isLogLevelForced():
+            ui.message("logging level is forced and cannot be changed")
+            return
+        current_level_name = config.conf["general"]["loggingLevel"]
+        current_level = LoggingLevel[current_level_name]
+        target_level = (
+            LoggingLevel.INFO
+            if current_level is LoggingLevel.DEBUG_UNREDACTED
+            else LoggingLevel.DEBUG_UNREDACTED
+        )
+        config.conf["general"]["loggingLevel"] = target_level.name
+        logHandler.setLogLevelFromConfig()
+        ui.message(target_level.name)
