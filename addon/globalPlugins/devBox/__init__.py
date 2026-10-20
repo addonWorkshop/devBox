@@ -14,6 +14,7 @@ import speech
 import textInfos
 import ui
 from config.configFlags import LoggingLevel
+from gui import logViewer
 
 from . import interface
 from .features.diff_sounds import DiffSoundsFeature
@@ -213,3 +214,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         config.conf["general"]["loggingLevel"] = target_level.name
         logHandler.setLogLevelFromConfig()
         ui.message(target_level.name)
+
+    @scriptHandler.script(description="View log (without developer info)")
+    def script_view_log(self, gesture):
+        logViewer.activate()
